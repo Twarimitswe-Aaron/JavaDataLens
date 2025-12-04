@@ -4,21 +4,6 @@ import com.aart.textanalyzer.analysis.AnalysisTask;
 import com.aart.textanalyzer.model.AnalysisResult;
 import java.util.concurrent.Callable;
 
-/**
- * A worker class that wraps an {@link AnalysisTask} and executes it.
- * <p>
- * <strong>Concept: Multithreading & Callable</strong>
- * Implements {@link Callable}, which is similar to {@link Runnable} but can
- * return a result
- * and throw a checked exception. This is perfect for tasks submitted to an
- * {@link java.util.concurrent.ExecutorService}.
- * </p>
- * <p>
- * <strong>Concept: Generics</strong>
- * The class is generic {@code <T>} so it can handle any type of analysis task
- * and return the correct result type.
- * </p>
- */
 public class AnalysisWorker<T> implements Callable<AnalysisResult<T>> {
 
     private final AnalysisTask<T> task;

@@ -20,25 +20,16 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * The main entry point for the Text Analysis Tool.
- * <p>
- * <strong>Concept: I/O Streams</strong>
- * Uses {@link BufferedReader} for efficient text reading.
- * Uses {@link ObjectOutputStream} and {@link ObjectInputStream} for
- * serialization.
- * </p>
- */
 public class MainApplication {
 
     private static final String REPORT_DIR = "reports";
     private static final String REPORT_FILE = "analysis_report.dat";
 
     public static void main(String[] args) {
-        // 1. Validate Input
+      
         if (args.length < 1) {
             System.out.println("Usage: java com.aart.textanalyzer.MainApplication <file_path>");
-            // Create a dummy file for demonstration if none provided
+           
             System.out.println("No file provided. Creating and using 'sample.txt' for demonstration.");
             createSampleFile("sample.txt");
             args = new String[] { "sample.txt" };
@@ -54,9 +45,6 @@ public class MainApplication {
 
         System.out.println("Starting Analysis for: " + filePath);
 
-        // 2. Read File Content
-        // Concept: Try-with-resources (Automatic Resource Management)
-        // Ensures BufferedReader is closed automatically.
         StringBuilder contentBuilder = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(inputFile))) {
             String line;
@@ -70,40 +58,35 @@ public class MainApplication {
 
         String fullText = contentBuilder.toString();
 
-        // 3. Prepare Tasks
-        // Concept: Polymorphism - List of AnalysisTask objects
         List<AnalysisTask<?>> tasks = new ArrayList<>();
         tasks.add(new WordCountTask());
-        tasks.add(new RegexMatchTask("\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b")); // Email Regex
+        tasks.add(new RegexMatchTask("\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b"));
         tasks.add(new RegexMatchTask(
-                "https?://(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)")); // URL
-                                                                                                                              // Regex
+                "https?://(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)"));
 
-        // 4. Prepare Workers
+     
         List<AnalysisWorker<?>> workers = new ArrayList<>();
         for (AnalysisTask<?> task : tasks) {
             workers.add(new AnalysisWorker<>(task, fullText));
         }
 
-        // 5. Execute Tasks Concurrently
+     
         TaskManager taskManager = new TaskManager();
         List<AnalysisResult<?>> results = taskManager.executeAll(workers);
         taskManager.shutdown();
 
-        // 6. Generate Report
+   
         Report report = new Report(inputFile.getName());
         for (AnalysisResult<?> result : results) {
             report.addResult(result);
         }
 
-        // 7. Display Report
         System.out.println("\n" + report);
 
-        // 8. Serialize Report
-        // Concept: Object Streams (Persistence)
+        
         saveReport(report);
 
-        // 9. Verify Serialization (Optional)
+        
         Report loadedReport = loadReport();
         if (loadedReport != null) {
             System.out.println("\n[Verification] Successfully loaded report from disk.");

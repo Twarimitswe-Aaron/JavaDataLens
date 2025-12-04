@@ -1,0 +1,4 @@
+Hello World! This is a sample text file for the Java Text Analysis Tool.
+It contains some emails like test@example.com and admin@site.org.
+It also has some URLs like https://www.google.com and http://java.com.
+Java is great. Java is powerful. Multithreading in Java is fun.
